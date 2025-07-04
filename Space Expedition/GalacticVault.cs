@@ -53,7 +53,7 @@
                         AddArtifact();
                         break;
                     case "2":
-                        // ViewInventory();
+                         ViewInventory();
                         break;
                     case "3":
                         loggedIn = false;
@@ -78,8 +78,9 @@
                         for(int i = 0; i < Inventory.Length; i++) {
                             newInvt[i] = Inventory[i];
                         }
-                        Inventory = SortInventory(newInvt);
+                        Inventory = newInvt;
                     }
+                    Inventory = SortInventory();
                 }
             } catch (Exception ex) {
                 Console.WriteLine($"An exception occured while attempting to access {vaultFile}: {ex.Message}");
@@ -100,7 +101,8 @@
                         line = reader.ReadLine();
                         string[] parameters = line.Split(",");
                         parameters[0] = DecodeName(parameters[0]);
-                        Console.WriteLine(parameters[0]);
+                        Artifact newArtifact = new Artifact(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                        Inventory = InsertArtifact(newArtifact);
 
                     }
                 } else {
@@ -120,6 +122,25 @@
                     Console.WriteLine("2. Search artifact by name");
                     Console.WriteLine("3. Exit");
                     input = Console.ReadLine();
+
+                    switch(input) {
+                        case "1":
+                            foreach(Artifact a in Inventory) {
+                                Console.WriteLine(a.Name);
+                            }
+                            break;
+                        case "2":
+                            Console.WriteLine("Enter artifact name: ");
+                            input = Console.ReadLine();
+                            SearchInventory(input);
+                            break;
+                        case "3":
+                            viewing = false;
+                            break;
+                        default:
+                            Console.WriteLine("Invalid input");
+                            break;
+                    }
                 }
             }
             catch (Exception ex) {
@@ -160,13 +181,13 @@
             return character;
         }
 
-        public Artifact[] InsertArtifact (Artifact[] Inventroy, Artifact newArtifact) {
+        public Artifact[] InsertArtifact (Artifact newArtifact) {
 
-            Artifact[] newInventory = new Artifact[Inventroy.Length + 1];
+            Artifact[] newInventory = new Artifact[Inventory.Length + 1];
             int i = Inventory.Length - 1;
 
             while(i >= 0 && string.Compare(Inventory[i].Name, newArtifact.Name) > 0) {
-                newInventory[i + 1] = Inventroy[i];
+                newInventory[i + 1] = Inventory[i];
                 i--;
             }
 
@@ -179,7 +200,7 @@
             return newInventory;
         }
 
-        public Artifact[] SortInventory (Artifact[] Inventory) {
+        public Artifact[] SortInventory () {
             for ( int i = 1; i < Inventory.Length; i++) {
                 Artifact key = Inventory[i];
                 int j = i - 1;
@@ -194,7 +215,23 @@
         }
 
         public void SearchInventory (string search) {
+            int low = 0;
+            int high = Inventory.Length - 1;
 
+            while (low <= high) {
+                int mid = low + high / 2;
+                int comp = string.Compare(Inventory[mid].Name, search);
+
+                if (comp == 0) {
+                    Console.WriteLine(Inventory[mid]);
+                    break;
+                } else if (comp < 0) {
+                    low = mid + 1;
+                } else {
+                    high = mid - 1;
+                }
+            }
+            Console.WriteLine("Artifact not found.");
         }
     }
 }
