@@ -52,10 +52,13 @@
                         case "1":
                             Console.Clear();
                             AddArtifact();
+                            Console.ReadKey();
+                            Console.Clear();
                             break;
                         case "2":
                             Console.Clear();
                             ViewInventory();
+                            Console.Clear();
                             break;
                         case "3":
                             Console.Clear();
@@ -104,8 +107,10 @@
                 Console.WriteLine("Note: Artifact names are case sensetive.");
                 Console.Write("Enter artifact name: ");
                 input = (Console.ReadLine()) + ".txt";
+
                 if (File.Exists(input)) {
                     Console.WriteLine("Artifact file found.");
+
                     using (StreamReader reader = new StreamReader(input)) {
                         string line = "";
                         line = reader.ReadLine();
@@ -113,11 +118,13 @@
                         parameters[0] = DecodeName(parameters[0]);
                         Artifact newArtifact = new Artifact(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
                         Inventory = InsertArtifact(newArtifact);
-
+                        Console.WriteLine("Added artifact data to inventory");
                     }
+
                 } else {
                     Console.WriteLine("Artifact file not found.");
                 }
+
             } catch (Exception ex) {
                 Console.WriteLine($"An exception occured: {ex.Message}");
             }
@@ -127,21 +134,26 @@
         public void ViewInventory () {
             string input = "";
             bool viewing = true;
+
             try {
+
                 while (viewing) {
                     Console.WriteLine("1. View artifact list");
                     Console.WriteLine("2. Search artifact by name");
                     Console.WriteLine("3. Exit");
+                    Console.Write("Make a selection: ");
                     input = Console.ReadLine();
 
                     switch(input) {
+
+                        // I didn't clear the console here for convenience sake. Artifact names are long and it's better to know what you're looking for.
                         case "1":
                             foreach(Artifact a in Inventory) {
                                 Console.WriteLine(a.Name);
                             }
                             break;
                         case "2":
-                            Console.WriteLine("Enter artifact name: ");
+                            Console.Write("Enter artifact name: ");
                             input = Console.ReadLine();
                             SearchInventory(input);
                             break;
@@ -154,6 +166,7 @@
                     }
                 }
             }
+
             catch (Exception ex) {
                 Console.WriteLine($"An exception occured: {ex.Message}");
             }
@@ -163,6 +176,7 @@
         public void Exit() {
             Console.WriteLine("Saving Expedition Summary...");
             using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
+
                 foreach (Artifact a in Inventory) {
                     string line = a.Save();
                     writer.WriteLine(line);
@@ -199,6 +213,7 @@
             if (level == 1) {
                 index = Array.IndexOf(Original, character);
                 character = Original[Original.Length - 1 - index];
+
             } else {
                 index = Array.IndexOf(Original, character);
                 character = Mapped[index];
@@ -228,6 +243,7 @@
         }
 
         public Artifact[] SortInventory () {
+
             for ( int i = 1; i < Inventory.Length; i++) {
                 Artifact key = Inventory[i];
                 int j = i - 1;
@@ -253,6 +269,7 @@
                 if (comp == 0) {
                     Console.WriteLine(Inventory[mid]);
                     found = true;
+                    break;
                 } else if (comp < 0) {
                     low = mid + 1;
                 } else {
@@ -267,9 +284,11 @@
         // Formats casing
         public string Format(string name) {
             string[] words = name.Split(' ');
+
             for (int i = 0; i < words.Length; i++) {
                 string first = char.ToUpper(words[i][0]).ToString();
                 string rest = "";
+
                 if (words[i].Length > 0) {
                     rest = words[i].Substring(1).ToLower();
                     words[i] = first + rest;
