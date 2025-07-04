@@ -40,7 +40,9 @@
             bool loggedIn = true;
 
             while(loggedIn) {
+                //try {
 
+                //}
                 Console.WriteLine("Welcome to the Galactic Vault manager.");
                 Console.WriteLine("1. Add Artifact.");
                 Console.WriteLine("2. View artifact inventroy.");
@@ -57,6 +59,9 @@
                         break;
                     case "3":
                         loggedIn = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid Input");
                         break;
                 }
             }
@@ -162,12 +167,15 @@
                 splitName[i] = String.Join("", splitWord);
             }
             name = String.Join(" ", splitName);
+            name = Format(name);
             return name;
         }
 
+        // Recusive method that runs on an encoded character until it's decoded
         private char Decode(char character, int level) {
 
             int index = 0;
+            character = char.ToUpper(character);
 
             if (level == 1) {
                 index = Array.IndexOf(Original, character);
@@ -232,6 +240,20 @@
                 }
             }
             Console.WriteLine("Artifact not found.");
+        }
+
+        // Formats casing
+        public string Format(string name) {
+            string[] words = name.Split(' ');
+            for (int i = 0; i < words.Length; i++) {
+                string first = char.ToUpper(words[i][0]).ToString();
+                string rest = "";
+                if (words[i].Length > 0) {
+                    rest = words[i].Substring(1).ToLower();
+                    words[i] = first + rest;
+                }
+            }
+            return string.Join(' ', words);
         }
     }
 }
