@@ -40,32 +40,36 @@
             bool loggedIn = true;
 
             while(loggedIn) {
-                //try {
-
-                //}
-                Console.WriteLine("Welcome to the Galactic Vault manager.");
-                Console.WriteLine("1. Add Artifact.");
-                Console.WriteLine("2. View artifact inventroy.");
-                Console.WriteLine("3. Exit");
-                Console.Write("Make a selection: ");
-                input = Console.ReadLine();
+                try {
+                    Console.WriteLine("Welcome to the Galactic Vault manager.");
+                    Console.WriteLine("1. Add Artifact.");
+                    Console.WriteLine("2. View artifact inventroy.");
+                    Console.WriteLine("3. Exit");
+                    Console.Write("Make a selection: ");
+                    input = Console.ReadLine();
             
-                switch (input) {
-                    case "1":
-                        AddArtifact();
-                        break;
-                    case "2":
-                         ViewInventory();
-                        break;
-                    case "3":
-                        loggedIn = false;
-                        break;
-                    default:
-                        Console.WriteLine("Invalid Input");
-                        break;
+                    switch (input) {
+                        case "1":
+                            Console.Clear();
+                            AddArtifact();
+                            break;
+                        case "2":
+                            Console.Clear();
+                            ViewInventory();
+                            break;
+                        case "3":
+                            Console.Clear();
+                            Exit();
+                            loggedIn = false;
+                            break;
+                        default:
+                            Console.WriteLine("Invalid Input");
+                            break;
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"An exception occured: {ex.Message}");
                 }
             }
-            Console.Clear();
         }
 
         // Creates initial inventory from vault file.
@@ -92,6 +96,7 @@
             }
         }
 
+        // Adds artifact data from file based on user input and sorts it into Inventory
         public void AddArtifact() {
             string input = "";
 
@@ -118,6 +123,7 @@
             }
         }
 
+        // View list of artifact names or search by artifact name to view artifact in detail
         public void ViewInventory () {
             string input = "";
             bool viewing = true;
@@ -151,6 +157,19 @@
             catch (Exception ex) {
                 Console.WriteLine($"An exception occured: {ex.Message}");
             }
+        }
+
+        // Saves the inventory to expedition summary file and ends the program
+        public void Exit() {
+            Console.WriteLine("Saving Expedition Summary...");
+            using (StreamWriter writer = new StreamWriter("expedition_summary.txt")) {
+                foreach (Artifact a in Inventory) {
+                    string line = a.Save();
+                    writer.WriteLine(line);
+                }
+            }
+            Console.WriteLine("Expedition Summary saved!");
+            Console.WriteLine("Thank you for using the Galactic Vault Manager.");
         }
 
         public string DecodeName(string name) {
@@ -223,6 +242,7 @@
         }
 
         public void SearchInventory (string search) {
+            bool found = false;
             int low = 0;
             int high = Inventory.Length - 1;
 
@@ -232,14 +252,16 @@
 
                 if (comp == 0) {
                     Console.WriteLine(Inventory[mid]);
-                    break;
+                    found = true;
                 } else if (comp < 0) {
                     low = mid + 1;
                 } else {
                     high = mid - 1;
                 }
             }
-            Console.WriteLine("Artifact not found.");
+            if (!found) {
+                Console.WriteLine("Artifact not found.");
+            }
         }
 
         // Formats casing

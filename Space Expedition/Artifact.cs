@@ -20,8 +20,14 @@ namespace Space_Expedition {
             Description = description;
         }
 
+        // This ones nicer to look at
         public override string ToString () {
             return $"{Name} | {Planet} | {Date} | {Location} | {Description}";
+        }
+
+        // This ones how the file was formatted
+        public string Save() {
+            return $"{Name},{Planet},{Date},{Location},{Description}";
         }
     }
 }
