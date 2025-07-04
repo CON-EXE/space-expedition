@@ -12,35 +12,26 @@
             Mapped = ['H', 'Z', 'A', 'U', 'Y', 'E', 'K', 'G', 'O', 'T', 'I', 'R', 'J', 'V', 'W', 'N', 'M', 'F', 'Q', 'S', 'D', 'B', 'X', 'L', 'C', 'P'];
         }
 
-        public void StartUp (string database) {
+        public void StartUp () {
 
-            if (Directory.Exists(database)) {
+            if (File.Exists("galactic_vault.txt")) {
                 Console.WriteLine("Vault Database found");
-                string[] files = Directory.GetFiles(database);
-                Console.WriteLine("Number of files found: " + files.Length);
+                Console.WriteLine("Accessing Artifact Data...");
 
-                if (files.Length > 0) {
-                    Console.WriteLine("Accessing Artifact Data...");
+                CreateInventory("galactic_vault.txt");
 
-                    foreach (string file in files) {
-                        ProcessFile(file);
-                    }
-                    Console.WriteLine("Artifact data processed successfully!");
-                    Console.Write("Press any key to continue...");
-                    Console.ReadKey();
-
-                } else {
-                    Console.WriteLine("No artifact data found.");
-                    Console.Write("Press any key to continue...");
-                    Console.ReadKey();
-                }
+                Console.WriteLine("Artifact data processed successfully!");
+                Console.Write("Press any key to continue...");
+                Console.ReadKey();
 
             } else {
                 Console.Write("Unable to locate Vault Database.");
                 Console.Write("Press any key to continue...");
                 Console.ReadKey();
             }
+
             Console.Clear();
+            menu();
         }
 
         public void menu() {
@@ -48,16 +39,18 @@
             string input = "";
             bool loggedIn = true;
 
-            Console.WriteLine("Welcome to the Galactic Vault manager. Please make a selection:");
-            Console.WriteLine("1. Add Artifact.");
-            Console.WriteLine("2. View artifact inventroy.");
-            Console.WriteLine("3. Exit");
-            input = Console.ReadLine();
-            
             while(loggedIn) {
+
+                Console.WriteLine("Welcome to the Galactic Vault manager.");
+                Console.WriteLine("1. Add Artifact.");
+                Console.WriteLine("2. View artifact inventroy.");
+                Console.WriteLine("3. Exit");
+                Console.Write("Make a selection: ");
+                input = Console.ReadLine();
+            
                 switch (input) {
                     case "1":
-                        // AddArtifact();
+                        AddArtifact();
                         break;
                     case "2":
                         // ViewInventory();
@@ -67,14 +60,38 @@
                         break;
                 }
             }
+            Console.Clear();
         }
 
-        public void ProcessFile (string file) {
+        // Creates initial inventory from vault file.
+        public void CreateInventory(string vaultFile) {
+            try {
+                using (StreamReader reader = new StreamReader(vaultFile)) {
+                    string line = "";
+                    while ((line = reader.ReadLine()) != null) {
+                        string[] parameters = line.Split(",");
+                        parameters[0] = DecodeName(parameters[0]);
+                        Artifact newArtifact = new Artifact(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4]);
+                        Artifact[] newInvt = new Artifact[Inventory.Length + 1];
+                        newInvt[newInvt.Length - 1] = newArtifact;
+
+                        for(int i = 0; i < Inventory.Length; i++) {
+                            newInvt[i] = Inventory[i];
+                        }
+                        Inventory = SortInventory(newInvt);
+                    }
+                }
+            } catch (Exception ex) {
+                Console.WriteLine($"An exception occured while attempting to access {vaultFile}: {ex.Message}");
+            }
+        }
+
+        public void Processfile (string file) {
             try {
                 using (StreamReader reader = new StreamReader(file)) {
                     string line = "";
                     while ((line = reader.ReadLine()) != null) {
-                        string[] parameters = line.Split(","); 
+                        string[] parameters = line.Split(",");
                         parameters[0] = DecodeName(parameters[0]);
                         Console.WriteLine(parameters[0]);
                     }
@@ -82,6 +99,19 @@
             }
             catch (Exception ex) {
                 Console.WriteLine($"An exception occured while attempting to access {file}: {ex.Message}");
+            }
+        }
+
+        public void AddArtifact() {
+            string input = "";
+            Console.WriteLine("Note: Artifact names are case sensetive.");
+            Console.Write("Enter artifact name: ");
+            input = (Console.ReadLine()) + ".txt";
+            if (File.Exists(input)) {
+                Console.WriteLine("Artifact file found.");
+                //ProcessFile(input);
+            } else {
+                Console.WriteLine("Artifact file not found.");
             }
         }
 
@@ -103,7 +133,9 @@
         }
 
         private char Decode(char character, int level) {
+
             int index = 0;
+
             if (level == 1) {
                 index = Array.IndexOf(Original, character);
                 character = Original[Original.Length - 1 - index];
@@ -114,6 +146,43 @@
                 character = Decode(character, level);
             }
             return character;
+        }
+
+        public Artifact[] InsertArtifact (Artifact[] Inventroy, Artifact newArtifact) {
+
+            Artifact[] newInventory = new Artifact[Inventroy.Length + 1];
+            int i = Inventory.Length - 1;
+
+            while(i >= 0 && string.Compare(Inventory[i].Name, newArtifact.Name) > 0) {
+                newInventory[i + 1] = Inventroy[i];
+                i--;
+            }
+
+            newInventory[i + 1] = newArtifact;
+
+            for (int j = 0; j <= i; j++) {
+                newInventory[j] = Inventory[j];
+            }
+            
+            return newInventory;
+        }
+
+        public Artifact[] SortInventory (Artifact[] Inventory) {
+            for ( int i = 1; i < Inventory.Length; i++) {
+                Artifact key = Inventory[i];
+                int j = i - 1;
+
+                while (j >= 0 && string.Compare(Inventory[j].Name, key.Name) > 0) {
+                    Inventory[j + 1] = Inventory[j];
+                    j--;
+                }
+                Inventory[j + 1] = key;
+            }
+            return Inventory;
+        }
+
+        public void SearchInventory (string search) {
+
         }
     }
 }

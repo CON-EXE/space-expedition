@@ -6,9 +6,9 @@ namespace Space_Expedition {
         static void Main (string[] args) {
             GalacticVault vault = new GalacticVault();
 
-            string path = "Artifacts"; // File Location
+            //string path = "Artifacts"; // File Location
 
-            vault.StartUp(path);
+            vault.StartUp();
         }
     }
 }
