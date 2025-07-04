@@ -86,32 +86,44 @@
             }
         }
 
-        public void Processfile (string file) {
+        public void AddArtifact() {
+            string input = "";
+
             try {
-                using (StreamReader reader = new StreamReader(file)) {
-                    string line = "";
-                    while ((line = reader.ReadLine()) != null) {
+                Console.WriteLine("Note: Artifact names are case sensetive.");
+                Console.Write("Enter artifact name: ");
+                input = (Console.ReadLine()) + ".txt";
+                if (File.Exists(input)) {
+                    Console.WriteLine("Artifact file found.");
+                    using (StreamReader reader = new StreamReader(input)) {
+                        string line = "";
+                        line = reader.ReadLine();
                         string[] parameters = line.Split(",");
                         parameters[0] = DecodeName(parameters[0]);
                         Console.WriteLine(parameters[0]);
+
                     }
+                } else {
+                    Console.WriteLine("Artifact file not found.");
                 }
-            }
-            catch (Exception ex) {
-                Console.WriteLine($"An exception occured while attempting to access {file}: {ex.Message}");
+            } catch (Exception ex) {
+                Console.WriteLine($"An exception occured: {ex.Message}");
             }
         }
 
-        public void AddArtifact() {
+        public void ViewInventory () {
             string input = "";
-            Console.WriteLine("Note: Artifact names are case sensetive.");
-            Console.Write("Enter artifact name: ");
-            input = (Console.ReadLine()) + ".txt";
-            if (File.Exists(input)) {
-                Console.WriteLine("Artifact file found.");
-                //ProcessFile(input);
-            } else {
-                Console.WriteLine("Artifact file not found.");
+            bool viewing = true;
+            try {
+                while (viewing) {
+                    Console.WriteLine("1. View artifact list");
+                    Console.WriteLine("2. Search artifact by name");
+                    Console.WriteLine("3. Exit");
+                    input = Console.ReadLine();
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"An exception occured: {ex.Message}");
             }
         }
 
